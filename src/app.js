@@ -1,11 +1,30 @@
 var UI = require('ui');
 var ajax = require('ajax');
+var Vector2 = require('vector2');
+var configURL = 'http://trusk89.github.io/PebbleHAB/';
 var URL = 'http://bartis.asuscomm.com:7070/rest/items';
 var username = 'alex.bartis@gmail.com';
 var password = 'marinaru89';
 var items = [];
-var temperatureItems = [];
 var itemsArray = [];
+
+var splashWindow = new UI.Window();
+
+// Text element to inform user
+var text = new UI.Text({
+  position: new Vector2(0, 0),
+  size: new Vector2(144, 168),
+  text:'Downloading OpenHAB data...',
+  font:'GOTHIC_28_BOLD',
+  color:'black',
+  textOverflow:'wrap',
+  textAlign:'center',
+  backgroundColor:'white'
+});
+
+// Add to splashWindow and show
+splashWindow.add(text);
+splashWindow.show();
 
 var parseFeed = function (data, quantity) {
     var i;
@@ -14,22 +33,23 @@ var parseFeed = function (data, quantity) {
     for (i = 0; i < len; i++) {
         var item = array.item[i];
         if (item.type === 'SwitchItem' && item.state != 'Uninitialized') {
-						console.log("Items array " + itemsArray.name);
+            console.log("Items array " + itemsArray.name);
             // Add to menu items array
             items.push({
                 title: item.name,
                 subtitle: item.state
             });
-        } else if (item.name.indexOf("temp") > -1 || item.name.indexOf("Temp") > -1 ) {
-					console.log('Temeperature items are ' + item.name);
-						items.push({
+        } else if (item.name.indexOf("temp") > -1 || item.name.indexOf("Temp") > -1) {
+            console.log('Temeperature items are ' + item.name);
+            items.push({
                 title: item.name,
                 subtitle: item.state
             });
-				}
+        }
     }
 
     // Finally return whole array
+		itemsArray = items;
     return items;
 };
 
@@ -116,7 +136,7 @@ function (data) {
     console.log('Successfully fetched OpenHAB data!' + data);
     // Construct Menu to show to user
     var menuItems = parseFeed(data);
-		console.log('Menu Items number ' + menuItems.length);
+    console.log('Menu Items number ' + menuItems.length);
     var resultsMenu = new UI.Menu({
         sections: [{
             title: 'Items',
@@ -126,6 +146,7 @@ function (data) {
 
     // Show the Menu, hide the splash
     resultsMenu.show();
+		splashWindow.hide();
 },
 
 function (error) {
@@ -134,4 +155,9 @@ function (error) {
     var datetime = currentdate.getDate() + "/" + (currentdate.getMonth() + 1) + "/" + currentdate.getFullYear() + " @ " + currentdate.getHours() + ":" + currentdate.getMinutes();
     console.log(datetime);
     console.log('Failed fetching weather data: ' + error);
+});
+
+Pebble.addEventListener('showConfiguration', function(e) {
+  // Show config page
+  Pebble.openURL(configURL);
 });
