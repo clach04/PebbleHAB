@@ -47,8 +47,6 @@
         var options = {}
         //Add all textual values
         $('textarea, select, [type="hidden"], [type="password"], [type="text"]').each(function(){options[$(this).attr('id')] = $(this).val();})
-      
-        console.log(options);
       }
       $().ready(function() {
         $("#b-cancel").click(function() {
@@ -57,6 +55,7 @@
         });
         $("#b-submit").click(function() {
           console.log("Submit");
+          console.log("Options "JSON.stringify(saveOptions()));
           var location = "pebblejs://close#" + encodeURIComponent(JSON.stringify(saveOptions()));
           console.log("Warping to: " + location);
           console.log(location);
