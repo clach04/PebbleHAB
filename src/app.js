@@ -12,14 +12,25 @@ var splashWindow = new UI.Window();
 
 // Text element to inform user
 var text = new UI.Text({
-  position: new Vector2(0, 0),
-  size: new Vector2(144, 168),
-  text:'Downloading OpenHAB data...',
-  font:'GOTHIC_28_BOLD',
-  color:'black',
-  textOverflow:'wrap',
-  textAlign:'center',
-  backgroundColor:'white'
+    position: new Vector2(0, 0),
+    size: new Vector2(144, 168),
+    text: 'Downloading OpenHAB data...',
+    font: 'GOTHIC_28_BOLD',
+    color: 'black',
+    textOverflow: 'wrap',
+    textAlign: 'center',
+    backgroundColor: 'white'
+});
+
+var errorText = new UI.Text({
+    position: new Vector2(0, 0),
+    size: new Vector2(144, 168),
+    text: 'An error has occurred',
+    font: 'GOTHIC_28_BOLD',
+    color: 'black',
+    textOverflow: 'wrap',
+    textAlign: 'center',
+    backgroundColor: 'white'
 });
 
 // Add to splashWindow and show
@@ -33,7 +44,6 @@ var parseFeed = function (data, quantity) {
     for (i = 0; i < len; i++) {
         var item = array.item[i];
         if (item.type === 'SwitchItem' && item.state != 'Uninitialized') {
-            console.log("Items array " + itemsArray.name);
             // Add to menu items array
             items.push({
                 title: item.name,
@@ -49,7 +59,7 @@ var parseFeed = function (data, quantity) {
     }
 
     // Finally return whole array
-		itemsArray = items;
+    itemsArray = items;
     return items;
 };
 
@@ -146,7 +156,7 @@ function (data) {
 
     // Show the Menu, hide the splash
     resultsMenu.show();
-		splashWindow.hide();
+    splashWindow.hide();
 },
 
 function (error) {
@@ -155,9 +165,19 @@ function (error) {
     var datetime = currentdate.getDate() + "/" + (currentdate.getMonth() + 1) + "/" + currentdate.getFullYear() + " @ " + currentdate.getHours() + ":" + currentdate.getMinutes();
     console.log(datetime);
     console.log('Failed fetching weather data: ' + error);
+
+    splashWindow.add(errorText);
+    splashWindow.show();
 });
 
-Pebble.addEventListener('showConfiguration', function(e) {
-  // Show config page
-  Pebble.openURL(configURL);
+Pebble.addEventListener('showConfiguration', function (e) {
+    // Show config page
+    Pebble.openURL(configURL);
+});
+
+Pebble.addEventListener('webviewclosed',
+
+function (e) {
+    console.log('Configuration window returned: ' + e.response);
+    console.log(JSON.stringify(e.options));
 });
