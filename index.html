@@ -24,6 +24,8 @@ Password:<br>
 
 <script language="javascript" type="text/javascript"> 
 function windowClose() { 
+// Close config page and return data
+location.href = 'pebblejs://close#success';
 window.open('','_parent',''); 
 window.close();
 } 
