@@ -55,7 +55,7 @@
         });
         $("#b-submit").click(function() {
           console.log("Submit");
-          console.log("Options "JSON.stringify(saveOptions()));
+          console.log("Options " + JSON.stringify(saveOptions()));
           var location = "pebblejs://close#" + encodeURIComponent(JSON.stringify(saveOptions()));
           console.log("Warping to: " + location);
           console.log(location);
