@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>PebbleHAB</title>
+    <title>Configurable</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />
@@ -11,24 +11,24 @@
   <body>
     <div data-role="page" id="main">
       <div data-role="header" class="jqm-header">
-        <h1>PebbleHAB</h1>
+        <h1>Configurable Pebble App</h1>
       </div>
 
       <div data-role="content">
 
         <div data-role="fieldcontain">
           <label for="name">Server:port     </label>
-          <textarea cols="40" rows="8" name="server" id="server"></textarea>
+          <textarea cols="40" rows="8" name="server" required id="server"></textarea>
         </div>
 
         <div data-role="fieldcontain">
           <label for="name">Username:   </label>
-          <textarea cols="40" rows="8" name="username" id="username"></textarea>
+          <textarea cols="40" rows="8" name="username" required id="username"></textarea>
         </div>
 
         <div data-role="fieldcontain">
           <label for="name">Password:   </label>
-          <textarea cols="40" rows="8" name="password" id="password"></textarea>
+          <textarea cols="40" rows="8" name="password" required id="password"></textarea>
         </div>
         <div class="ui-body ui-body-b">
           <fieldset class="ui-grid-a">
