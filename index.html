@@ -47,6 +47,9 @@
         var options = {}
         //Add all textual values
         $('textarea, select, [type="hidden"], [type="password"], [type="text"]').each(function(){options[$(this).attr('id')] = $(this).val();})
+        //Add all checkbox type values
+        $('[type="radio"], [type="checkbox"]').each(function(){options[$(this).attr('id')] = $(this).is(':checked');})
+        return options;
       }
       $().ready(function() {
         $("#b-cancel").click(function() {
@@ -55,7 +58,6 @@
         });
         $("#b-submit").click(function() {
           console.log("Submit");
-          console.log("Options " + saveOptions());
           var location = "pebblejs://close#" + encodeURIComponent(JSON.stringify(saveOptions()));
           console.log("Warping to: " + location);
           console.log(location);
