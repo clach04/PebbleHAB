@@ -5,18 +5,12 @@ var configURL = 'http://trusk89.github.io/PebbleHAB/';
 var URL;
 var user;
 var password;
+var token;
 var items = [];
 var itemsArray = [];
-
 var splashWindow = new UI.Window();
 
-var getCredentials = function () {
-    if (localStorage.getItem('server')) {
-        URL = localStorage.getItem('server');
-    } else {
-        URL = '';
-    }
-
+function getCredentials () {
     if (localStorage.getItem('user')) {
         user = localStorage.getItem('user');
     } else {
@@ -28,52 +22,22 @@ var getCredentials = function () {
     } else {
         password = '';
     }
-};
-
-var setCredentials = function (jsonString) {
-    var myObject = JSON.parse(jsonString);
-    URL = myObject.server + '/rest/items';
-    user = myObject.username;
-    password = myObject.password;
-
-    localStorage.setItem(URL);
-    localStorage.setItem(user);
-    localStorage.setItem(password);
 	
-		console.log('Set credintials are ');
+		if (localStorage.getItem('server')) {
+        URL = localStorage.getItem('server');
+    } else {
+        URL = 'http://demo.openhab.org:8080/rest/items';
+    }
+	
+		console.log('Local credintials are ');
 		console.log(URL);
 		console.log(user);
 		console.log(password);
-};
+	
+		communicate();
+}
 
 getCredentials();
-
-// Text element to inform user
-var text = new UI.Text({
-    position: new Vector2(0, 0),
-    size: new Vector2(144, 168),
-    text: 'Downloading OpenHAB data...',
-    font: 'GOTHIC_28_BOLD',
-    color: 'black',
-    textOverflow: 'wrap',
-    textAlign: 'center',
-    backgroundColor: 'white'
-});
-
-var errorText = new UI.Text({
-    position: new Vector2(0, 0),
-    size: new Vector2(144, 168),
-    text: 'An error has occurred',
-    font: 'GOTHIC_28_BOLD',
-    color: 'black',
-    textOverflow: 'wrap',
-    textAlign: 'center',
-    backgroundColor: 'white'
-});
-
-// Add to splashWindow and show
-splashWindow.add(text);
-splashWindow.show();
 
 var parseFeed = function (data, quantity) {
     var i;
@@ -100,7 +64,6 @@ var parseFeed = function (data, quantity) {
     itemsArray = items;
     return items;
 };
-
 
 var Base64 = {
     // private property
@@ -135,7 +98,7 @@ var Base64 = {
         return output;
     },
 
-    _utf8_encode: function (string) {
+    _utf8_encode: function(string) {
         string = string.replace(/\r\n/g, "\n");
         var utftext = "";
 
@@ -145,10 +108,12 @@ var Base64 = {
 
             if (c < 128) {
                 utftext += String.fromCharCode(c);
-            } else if ((c > 127) && (c < 2048)) {
+            }
+            else if ((c > 127) && (c < 2048)) {
                 utftext += String.fromCharCode((c >> 6) | 192);
                 utftext += String.fromCharCode((c & 63) | 128);
-            } else {
+            }
+            else {
                 utftext += String.fromCharCode((c >> 12) | 224);
                 utftext += String.fromCharCode(((c >> 6) & 63) | 128);
                 utftext += String.fromCharCode((c & 63) | 128);
@@ -157,24 +122,25 @@ var Base64 = {
         }
 
         return utftext;
-    }
+    },
 };
 
-var createToken = function () {
+function createToken () {
+		console.log('++++++++++++AM INTRAT IN createToken+++++++++++');
     var string = user + ':' + password;
-    var toBase64 = Base64.encode(string);
-    return toBase64;
-};
+		console.log('++++++++++++TOKEN ESTE++++++++++++ ' + string);
+		Base64.encode(string);
+}
 
-var communicate = function () {
-	console.log(URL);
+function communicate () {
+	createToken();
     ajax({
         type: "GET",
         url: URL,
         headers: {
             Accept: "application/json; charset=utf-8",
                 "Content-Type": "application/json; charset=utf-8",
-            Authorization: "Basic " + createToken()
+            Authorization: "Basic " + token
         }
     },
 
@@ -207,11 +173,44 @@ var communicate = function () {
         var datetime = currentdate.getDate() + "/" + (currentdate.getMonth() + 1) + "/" + currentdate.getFullYear() + " @ " + currentdate.getHours() + ":" + currentdate.getMinutes();
         console.log(datetime);
         console.log('Failed fetching data: ' + error);
-
-        splashWindow.add(errorText);
-        splashWindow.show();
     });
-};
+}
+
+function setCredentials (jsonString) {
+    var myObject = JSON.parse(jsonString);
+	
+    URL = myObject.server + '/rest/items';
+    user = myObject.username;
+    password = myObject.password;
+
+    localStorage.setItem('server', myObject.server + '/rest/items');
+    localStorage.setItem('user', myObject.username);
+    localStorage.setItem('password', myObject.password);
+	
+		console.log('Set credintials are ');
+		console.log(myObject.server + '/rest/items');
+		console.log(myObject.username);
+		console.log(myObject.password);
+	
+		communicate();
+}
+
+
+// Text element to inform user
+var text = new UI.Text({
+    position: new Vector2(0, 0),
+    size: new Vector2(144, 168),
+    text: 'Downloading OpenHAB data...',
+    font: 'GOTHIC_28_BOLD',
+    color: 'black',
+    textOverflow: 'wrap',
+    textAlign: 'center',
+    backgroundColor: 'white'
+});
+
+// Add to splashWindow and show
+splashWindow.add(text);
+splashWindow.show();
 
 Pebble.addEventListener('showConfiguration', function (e) {
     // Show config page
