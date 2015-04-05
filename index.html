@@ -19,8 +19,15 @@ Password:<br>
 <input type="text" name="password">
 <br>
 <br>
-<input type="submit" name>
+<input type="submit" name="submit" onclick="windowClose();">
 </form>
+
+<script language="javascript" type="text/javascript"> 
+function windowClose() { 
+window.open('','_parent',''); 
+window.close();
+} 
+</script>
 
 </body>
 </html>
