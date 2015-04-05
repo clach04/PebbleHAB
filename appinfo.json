@@ -39,7 +39,7 @@
     "shortName": "PebbleHAB",
     "uuid": "5f6aa1ed-7e18-4263-a3a6-a80fd1b052e4",
     "versionCode": 1,
-    "versionLabel": "0.1",
+    "versionLabel": "0.2",
     "watchapp": {
         "watchface": false
     }

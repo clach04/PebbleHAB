@@ -2,13 +2,51 @@ var UI = require('ui');
 var ajax = require('ajax');
 var Vector2 = require('vector2');
 var configURL = 'http://trusk89.github.io/PebbleHAB/';
-var URL = 'http://bartis.asuscomm.com:7070/rest/items';
-var username = 'alex.bartis@gmail.com';
-var password = 'marinaru89';
+var URL;
+var user;
+var password;
 var items = [];
 var itemsArray = [];
 
 var splashWindow = new UI.Window();
+
+var getCredentials = function () {
+    if (localStorage.getItem('server')) {
+        URL = localStorage.getItem('server');
+    } else {
+        URL = '';
+    }
+
+    if (localStorage.getItem('user')) {
+        user = localStorage.getItem('user');
+    } else {
+        user = '';
+    }
+
+    if (localStorage.getItem('password')) {
+        password = localStorage.getItem('password');
+    } else {
+        password = '';
+    }
+};
+
+var setCredentials = function (jsonString) {
+    var myObject = JSON.parse(jsonString);
+    URL = myObject.server + '/rest/items';
+    user = myObject.username;
+    password = myObject.password;
+
+    localStorage.setItem(URL);
+    localStorage.setItem(user);
+    localStorage.setItem(password);
+	
+		console.log('Set credintials are ');
+		console.log(URL);
+		console.log(user);
+		console.log(password);
+};
+
+getCredentials();
 
 // Text element to inform user
 var text = new UI.Text({
@@ -123,52 +161,57 @@ var Base64 = {
 };
 
 var createToken = function () {
-    var string = username + ':' + password;
+    var string = user + ':' + password;
     var toBase64 = Base64.encode(string);
     return toBase64;
 };
 
-ajax({
-    type: "GET",
-    url: URL,
-    headers: {
-        Accept: "application/json; charset=utf-8",
-            "Content-Type": "application/json; charset=utf-8",
-        Authorization: "Basic " + createToken()
-    }
-},
+var communicate = function () {
+	console.log(URL);
+    ajax({
+        type: "GET",
+        url: URL,
+        headers: {
+            Accept: "application/json; charset=utf-8",
+                "Content-Type": "application/json; charset=utf-8",
+            Authorization: "Basic " + createToken()
+        }
+    },
 
-function (data) {
-    // Success!
-    var currentdate = new Date();
-    var datetime = currentdate.getDate() + "/" + (currentdate.getMonth() + 1) + "/" + currentdate.getFullYear() + " @ " + currentdate.getHours() + ":" + currentdate.getMinutes();
-    console.log(datetime);
-    console.log('Successfully fetched OpenHAB data!' + data);
-    // Construct Menu to show to user
-    var menuItems = parseFeed(data);
-    console.log('Menu Items number ' + menuItems.length);
-    var resultsMenu = new UI.Menu({
-        sections: [{
-            title: 'Items',
-            items: menuItems
-        }]
+    function (data) {
+
+        console.log("AM intrat in ajax");
+        // Success!
+        var currentdate = new Date();
+        var datetime = currentdate.getDate() + "/" + (currentdate.getMonth() + 1) + "/" + currentdate.getFullYear() + " @ " + currentdate.getHours() + ":" + currentdate.getMinutes();
+        console.log(datetime);
+        console.log('Successfully fetched OpenHAB data!' + data);
+        // Construct Menu to show to user
+        var menuItems = parseFeed(data);
+        console.log('Menu Items number ' + menuItems.length);
+        var resultsMenu = new UI.Menu({
+            sections: [{
+                title: 'Items',
+                items: menuItems
+            }]
+        });
+
+        // Show the Menu, hide the splash
+        resultsMenu.show();
+        splashWindow.hide();
+    },
+
+    function (error) {
+        // Failure!
+        var currentdate = new Date();
+        var datetime = currentdate.getDate() + "/" + (currentdate.getMonth() + 1) + "/" + currentdate.getFullYear() + " @ " + currentdate.getHours() + ":" + currentdate.getMinutes();
+        console.log(datetime);
+        console.log('Failed fetching data: ' + error);
+
+        splashWindow.add(errorText);
+        splashWindow.show();
     });
-
-    // Show the Menu, hide the splash
-    resultsMenu.show();
-    splashWindow.hide();
-},
-
-function (error) {
-    // Failure!
-    var currentdate = new Date();
-    var datetime = currentdate.getDate() + "/" + (currentdate.getMonth() + 1) + "/" + currentdate.getFullYear() + " @ " + currentdate.getHours() + ":" + currentdate.getMinutes();
-    console.log(datetime);
-    console.log('Failed fetching weather data: ' + error);
-
-    splashWindow.add(errorText);
-    splashWindow.show();
-});
+};
 
 Pebble.addEventListener('showConfiguration', function (e) {
     // Show config page
@@ -179,5 +222,6 @@ Pebble.addEventListener('webviewclosed',
 
 function (e) {
     console.log('Configuration window returned: ' + e.response);
-    console.log(JSON.stringify(e.options));
+    setCredentials(e.response);
+		communicate();
 });
