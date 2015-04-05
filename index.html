@@ -28,7 +28,7 @@
 
         <div data-role="fieldcontain">
           <label for="name">Password:   </label>
-          <textarea cols="40" rows="8" name="password" required id="password"></textarea>
+          <textarea cols="40" rows="8" name="password" required id="password" type="password"></textarea>
         </div>
         <div class="ui-body ui-body-b">
           <fieldset class="ui-grid-a">
@@ -47,6 +47,8 @@
         var options = {}
         //Add all textual values
         $('textarea, select, [type="hidden"], [type="password"], [type="text"]').each(function(){options[$(this).attr('id')] = $(this).val();})
+      
+         console.log(options);
       }
       $().ready(function() {
         $("#b-cancel").click(function() {
