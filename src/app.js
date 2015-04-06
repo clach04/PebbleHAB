@@ -123,17 +123,14 @@ var parseFeed = function (data, quantity) {
 };
 
 function sendUpdate(url, command) {
-	console.log('+++++++++++POST ITEMS ARE+++++++++++');
-		console.log(url);
-		console.log(command);
-		console.log(Base64.encode(user + ':' + password));
-    ajax({
-        type: 'POST',
+		ajax({
+        method: 'POST',
+				type: 'text',
         url: url,
-        data: command,
+				data: command,
         headers: {
-						Authorization: "Basic " + Base64.encode(user + ':' + password),
-						'Content-Type': 'text/plain'
+            "Content-Type": "text/plain",
+            Authorization: "Basic " + Base64.encode(user + ':' + password)
         }
     },
 
@@ -142,6 +139,7 @@ function sendUpdate(url, command) {
         var datetime = currentdate.getDate() + "/" + (currentdate.getMonth() + 1) + "/" + currentdate.getFullYear() + " @ " + currentdate.getHours() + ":" + currentdate.getMinutes();
         console.log(datetime);
         console.log('Succesfully posted data');
+				
 				getStatus();
     },
 
