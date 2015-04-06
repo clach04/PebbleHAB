@@ -6,9 +6,8 @@ var URL;
 var user;
 var password;
 var items = [];
-var itemsArray = [];
 var splashWindow = new UI.Window();
-var resultsMenu;
+var resultsMenu = new UI.Menu();
 
 var Base64 = {
     // private property
@@ -84,10 +83,10 @@ function getCredentials() {
 
     if (localStorage.getItem('server')) {
         URL = localStorage.getItem('server');
-        communicate();
+        getStatus();
     } else {
         URL = 'http://demo.openhab.org:8080/rest/items';
-        communicate();
+        getStatus();
     }
 
     console.log('Local credintials are ');
@@ -99,7 +98,7 @@ function getCredentials() {
 getCredentials();
 
 var parseFeed = function (data, quantity) {
-		items = [];
+    items = [];
     var i;
     var array = JSON.parse(data);
     var len = array.item.length;
@@ -112,7 +111,6 @@ var parseFeed = function (data, quantity) {
                 subtitle: item.state
             });
         } else if (item.name.indexOf("temp") > -1 || item.name.indexOf("Temp") > -1) {
-            console.log('Temeperature items are ' + item.name);
             items.push({
                 title: item.name,
                 subtitle: item.state
@@ -121,20 +119,52 @@ var parseFeed = function (data, quantity) {
     }
 
     // Finally return whole array
-    itemsArray = items;
     return items;
 };
 
-function communicate() {
+function sendUpdate(url, command) {
+	console.log('+++++++++++POST ITEMS ARE+++++++++++');
+		console.log(url);
+		console.log(command);
+		console.log(Base64.encode(user + ':' + password));
+    ajax({
+        type: 'POST',
+        url: url,
+        data: command,
+        headers: {
+						Authorization: "Basic " + Base64.encode(user + ':' + password),
+						'Content-Type': 'text/plain'
+        }
+    },
+
+    function (data) {
+        var currentdate = new Date();
+        var datetime = currentdate.getDate() + "/" + (currentdate.getMonth() + 1) + "/" + currentdate.getFullYear() + " @ " + currentdate.getHours() + ":" + currentdate.getMinutes();
+        console.log(datetime);
+        console.log('Succesfully posted data');
+				getStatus();
+    },
+
+    function (error) {
+        // Failure!
+        var currentdate = new Date();
+        var datetime = currentdate.getDate() + "/" + (currentdate.getMonth() + 1) + "/" + currentdate.getFullYear() + " @ " + currentdate.getHours() + ":" + currentdate.getMinutes();
+        console.log(datetime);
+        console.log('Failed posting data: ' + error);
+    });
+}
+
+function getStatus() {
     ajax({
         type: "GET",
         url: URL,
         headers: {
             Accept: "application/json; charset=utf-8",
-                "Content-Type": "application/json; charset=utf-8",
+            "Content-Type": "application/json; charset=utf-8",
             Authorization: "Basic " + Base64.encode(user + ':' + password)
         }
     },
+
     function (data) {
         // Success!
         var currentdate = new Date();
@@ -143,24 +173,42 @@ function communicate() {
         console.log('Successfully fetched OpenHAB data!' + data);
         // Construct Menu to show to user
         var menuItems = parseFeed(data);
-        console.log('Menu Items number ' + menuItems.length);
         if ((typeof resultsMenu == "undefined")) {
-						console.log('+++++++++++++++I HAVE ENTERED IN IF');
+            console.log('+++++++++++++++I HAVE ENTERED IN IF');
             resultsMenu = new UI.Menu({
                 sections: [{
                     title: 'Items',
                     items: menuItems
                 }]
             });
+            resultsMenu.on('select', function (e) {
+                console.log('The item is titled "' + e.item.title + '"');
+                var postURL = URL + '/' + e.item.title;
+                if (e.item.subtitle == 'ON') {
+                    sendUpdate(postURL, 'OFF');
+                } else if (e.item.subtitle == 'OFF') {
+                    sendUpdate(postURL, 'ON');
+                }
+
+            });
             resultsMenu.show();
         } else {
-						console.log('+++++++++++++++I HAVE ENTERED IN ELSe');
+            console.log('+++++++++++++++I HAVE ENTERED IN ELSE');
             resultsMenu.hide();
             resultsMenu = new UI.Menu({
                 sections: [{
                     title: 'Items',
                     items: menuItems
                 }]
+            });
+            resultsMenu.on('select', function (e) {
+                console.log('The item is titled "' + e.item.title + '"');
+                var postURL = URL + '/' + e.item.title;
+                if (e.item.subtitle == 'ON') {
+                    sendUpdate(postURL, 'OFF');
+                } else if (e.item.subtitle == 'OFF') {
+                    sendUpdate(postURL, 'ON');
+                }
             });
             resultsMenu.show();
         }
@@ -193,9 +241,8 @@ function setCredentials(jsonString) {
     console.log(myObject.username);
     console.log(myObject.password);
 
-    communicate();
+    getStatus();
 }
-
 
 // Text element to inform user
 var text = new UI.Text({
@@ -218,12 +265,10 @@ Pebble.addEventListener('showConfiguration', function (e) {
     Pebble.openURL(configURL);
 });
 
-Pebble.addEventListener('webviewclosed',
-
-function (e) {
+Pebble.addEventListener('webviewclosed', function (e) {
     console.log('Configuration window returned: ' + e.response);
     setCredentials(e.response);
     splashWindow.add(text);
     splashWindow.show();
-    communicate();
+    getStatus();
 });
