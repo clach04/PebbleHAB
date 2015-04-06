@@ -5,12 +5,71 @@ var configURL = 'http://trusk89.github.io/PebbleHAB/';
 var URL;
 var user;
 var password;
-var token;
 var items = [];
 var itemsArray = [];
 var splashWindow = new UI.Window();
+var resultsMenu;
 
-function getCredentials () {
+var Base64 = {
+    // private property
+    _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
+
+    // public method for encoding
+    encode: function (input) {
+        var output = "";
+        var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+        var i = 0;
+
+        input = Base64._utf8_encode(input);
+
+        while (i < input.length) {
+
+            chr1 = input.charCodeAt(i++);
+            chr2 = input.charCodeAt(i++);
+            chr3 = input.charCodeAt(i++);
+
+            enc1 = chr1 >> 2;
+            enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+            enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+            enc4 = chr3 & 63;
+
+            if (isNaN(chr2)) {
+                enc3 = enc4 = 64;
+            } else if (isNaN(chr3)) {
+                enc4 = 64;
+            }
+
+            output = output + this._keyStr.charAt(enc1) + this._keyStr.charAt(enc2) + this._keyStr.charAt(enc3) + this._keyStr.charAt(enc4);
+
+        }
+
+        return output;
+    },
+
+    _utf8_encode: function (string) {
+        string = string.replace(/\r\n/g, "\n");
+        var utftext = "";
+
+        for (var n = 0; n < string.length; n++) {
+
+            var c = string.charCodeAt(n);
+
+            if (c < 128) {
+                utftext += String.fromCharCode(c);
+            } else if ((c > 127) && (c < 2048)) {
+                utftext += String.fromCharCode((c >> 6) | 192);
+                utftext += String.fromCharCode((c & 63) | 128);
+            } else {
+                utftext += String.fromCharCode((c >> 12) | 224);
+                utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+                utftext += String.fromCharCode((c & 63) | 128);
+            }
+        }
+        return utftext;
+    },
+};
+
+function getCredentials() {
     if (localStorage.getItem('user')) {
         user = localStorage.getItem('user');
     } else {
@@ -22,24 +81,25 @@ function getCredentials () {
     } else {
         password = '';
     }
-	
-		if (localStorage.getItem('server')) {
+
+    if (localStorage.getItem('server')) {
         URL = localStorage.getItem('server');
+        communicate();
     } else {
         URL = 'http://demo.openhab.org:8080/rest/items';
+        communicate();
     }
-	
-		console.log('Local credintials are ');
-		console.log(URL);
-		console.log(user);
-		console.log(password);
-	
-		communicate();
+
+    console.log('Local credintials are ');
+    console.log(URL);
+    console.log(user);
+    console.log(password);
 }
 
 getCredentials();
 
 var parseFeed = function (data, quantity) {
+		items = [];
     var i;
     var array = JSON.parse(data);
     var len = array.item.length;
@@ -65,88 +125,17 @@ var parseFeed = function (data, quantity) {
     return items;
 };
 
-var Base64 = {
-    // private property
-    _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
-
-    // public method for encoding
-    encode: function (input) {
-        var output = "";
-        var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
-        var i = 0;
-
-        input = Base64._utf8_encode(input);
-        while (i < input.length) {
-            chr1 = input.charCodeAt(i++);
-            chr2 = input.charCodeAt(i++);
-            chr3 = input.charCodeAt(i++);
-
-            enc1 = chr1 >> 2;
-            enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
-            enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
-            enc4 = chr3 & 63;
-
-            if (isNaN(chr2)) {
-                enc3 = enc4 = 64;
-            } else if (isNaN(chr3)) {
-                enc4 = 64;
-            }
-
-            output = output + Base64._keyStr.charAt(enc1) + Base64._keyStr.charAt(enc2) + Base64._keyStr.charAt(enc3) + Base64._keyStr.charAt(enc4);
-
-        }
-        return output;
-    },
-
-    _utf8_encode: function(string) {
-        string = string.replace(/\r\n/g, "\n");
-        var utftext = "";
-
-        for (var n = 0; n < string.length; n++) {
-
-            var c = string.charCodeAt(n);
-
-            if (c < 128) {
-                utftext += String.fromCharCode(c);
-            }
-            else if ((c > 127) && (c < 2048)) {
-                utftext += String.fromCharCode((c >> 6) | 192);
-                utftext += String.fromCharCode((c & 63) | 128);
-            }
-            else {
-                utftext += String.fromCharCode((c >> 12) | 224);
-                utftext += String.fromCharCode(((c >> 6) & 63) | 128);
-                utftext += String.fromCharCode((c & 63) | 128);
-            }
-
-        }
-
-        return utftext;
-    },
-};
-
-function createToken () {
-		console.log('++++++++++++AM INTRAT IN createToken+++++++++++');
-    var string = user + ':' + password;
-		console.log('++++++++++++TOKEN ESTE++++++++++++ ' + string);
-		Base64.encode(string);
-}
-
-function communicate () {
-	createToken();
+function communicate() {
     ajax({
         type: "GET",
         url: URL,
         headers: {
             Accept: "application/json; charset=utf-8",
                 "Content-Type": "application/json; charset=utf-8",
-            Authorization: "Basic " + token
+            Authorization: "Basic " + Base64.encode(user + ':' + password)
         }
     },
-
     function (data) {
-
-        console.log("AM intrat in ajax");
         // Success!
         var currentdate = new Date();
         var datetime = currentdate.getDate() + "/" + (currentdate.getMonth() + 1) + "/" + currentdate.getFullYear() + " @ " + currentdate.getHours() + ":" + currentdate.getMinutes();
@@ -155,15 +144,27 @@ function communicate () {
         // Construct Menu to show to user
         var menuItems = parseFeed(data);
         console.log('Menu Items number ' + menuItems.length);
-        var resultsMenu = new UI.Menu({
-            sections: [{
-                title: 'Items',
-                items: menuItems
-            }]
-        });
-
+        if ((typeof resultsMenu == "undefined")) {
+						console.log('+++++++++++++++I HAVE ENTERED IN IF');
+            resultsMenu = new UI.Menu({
+                sections: [{
+                    title: 'Items',
+                    items: menuItems
+                }]
+            });
+            resultsMenu.show();
+        } else {
+						console.log('+++++++++++++++I HAVE ENTERED IN ELSe');
+            resultsMenu.hide();
+            resultsMenu = new UI.Menu({
+                sections: [{
+                    title: 'Items',
+                    items: menuItems
+                }]
+            });
+            resultsMenu.show();
+        }
         // Show the Menu, hide the splash
-        resultsMenu.show();
         splashWindow.hide();
     },
 
@@ -176,9 +177,9 @@ function communicate () {
     });
 }
 
-function setCredentials (jsonString) {
+function setCredentials(jsonString) {
     var myObject = JSON.parse(jsonString);
-	
+
     URL = myObject.server + '/rest/items';
     user = myObject.username;
     password = myObject.password;
@@ -186,13 +187,13 @@ function setCredentials (jsonString) {
     localStorage.setItem('server', myObject.server + '/rest/items');
     localStorage.setItem('user', myObject.username);
     localStorage.setItem('password', myObject.password);
-	
-		console.log('Set credintials are ');
-		console.log(myObject.server + '/rest/items');
-		console.log(myObject.username);
-		console.log(myObject.password);
-	
-		communicate();
+
+    console.log('Set credintials are ');
+    console.log(myObject.server + '/rest/items');
+    console.log(myObject.username);
+    console.log(myObject.password);
+
+    communicate();
 }
 
 
@@ -222,5 +223,7 @@ Pebble.addEventListener('webviewclosed',
 function (e) {
     console.log('Configuration window returned: ' + e.response);
     setCredentials(e.response);
-		communicate();
+    splashWindow.add(text);
+    splashWindow.show();
+    communicate();
 });
