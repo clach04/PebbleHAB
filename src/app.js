@@ -124,11 +124,11 @@ var parseFeed = function (data, quantity) {
 };
 
 function sendUpdate(url, command) {
-		ajax({
+    ajax({
         method: 'POST',
-				type: 'text',
+        type: 'text',
         url: url,
-				data: command,
+        data: command,
         headers: {
             "Content-Type": "text/plain",
             Authorization: "Basic " + Base64.encode(user + ':' + password)
@@ -140,8 +140,8 @@ function sendUpdate(url, command) {
         var datetime = currentdate.getDate() + "/" + (currentdate.getMonth() + 1) + "/" + currentdate.getFullYear() + " @ " + currentdate.getHours() + ":" + currentdate.getMinutes();
         console.log(datetime);
         console.log('Succesfully posted data');
-				
-				getStatus();
+
+        getStatus();
     },
 
     function (error) {
@@ -150,9 +150,9 @@ function sendUpdate(url, command) {
         var datetime = currentdate.getDate() + "/" + (currentdate.getMonth() + 1) + "/" + currentdate.getFullYear() + " @ " + currentdate.getHours() + ":" + currentdate.getMinutes();
         console.log(datetime);
         console.log('Failed posting data: ' + error);
-				var errorSubtitle = 'Command send failed';
-				createErrorCardWithTitleAndSubtitle(errorTitle, errorSubtitle);
-				splashWindow.hide();
+        var errorSubtitle = 'Command send failed';
+        createErrorCardWithTitleAndSubtitle(errorTitle, errorSubtitle);
+        splashWindow.hide();
     });
 }
 
@@ -162,7 +162,7 @@ function getStatus() {
         url: URL,
         headers: {
             Accept: "application/json; charset=utf-8",
-            "Content-Type": "application/json; charset=utf-8",
+                "Content-Type": "application/json; charset=utf-8",
             Authorization: "Basic " + Base64.encode(user + ':' + password)
         }
     },
@@ -222,10 +222,10 @@ function getStatus() {
         var datetime = currentdate.getDate() + "/" + (currentdate.getMonth() + 1) + "/" + currentdate.getFullYear() + " @ " + currentdate.getHours() + ":" + currentdate.getMinutes();
         console.log(datetime);
         console.log('Failed fetching data: ' + error);
-			
-				var errorSubtitle = 'Server connection could not be made';
-				createErrorCardWithTitleAndSubtitle(errorTitle, errorSubtitle);
-				splashWindow.hide();
+
+        var errorSubtitle = 'Server connection could not be made';
+        createErrorCardWithTitleAndSubtitle(errorTitle, errorSubtitle);
+        splashWindow.hide();
     });
 }
 
@@ -277,12 +277,12 @@ Pebble.addEventListener('webviewclosed', function (e) {
     getStatus();
 });
 
-function createErrorCardWithTitleAndSubtitle (title, subtitle) {
-	var card = new UI.Card({
-  title:title,
-  subtitle:subtitle
-});
+function createErrorCardWithTitleAndSubtitle(title, subtitle) {
+    var card = new UI.Card({
+        title: title,
+        subtitle: subtitle
+    });
 
-// Display the Card
-card.show();
+    // Display the Card
+    card.show();
 }
