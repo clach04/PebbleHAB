@@ -8,6 +8,7 @@ var password;
 var items = [];
 var splashWindow = new UI.Window();
 var resultsMenu = new UI.Menu();
+var errorTitle = 'Error';
 
 var Base64 = {
     // private property
@@ -149,6 +150,8 @@ function sendUpdate(url, command) {
         var datetime = currentdate.getDate() + "/" + (currentdate.getMonth() + 1) + "/" + currentdate.getFullYear() + " @ " + currentdate.getHours() + ":" + currentdate.getMinutes();
         console.log(datetime);
         console.log('Failed posting data: ' + error);
+				var errorSubtitle = 'Command send failed';
+				createErrorCardWithTitleAndSubtitle(errorTitle, errorSubtitle);
     });
 }
 
@@ -172,7 +175,6 @@ function getStatus() {
         // Construct Menu to show to user
         var menuItems = parseFeed(data);
         if ((typeof resultsMenu == "undefined")) {
-            console.log('+++++++++++++++I HAVE ENTERED IN IF');
             resultsMenu = new UI.Menu({
                 sections: [{
                     title: 'Items',
@@ -191,7 +193,6 @@ function getStatus() {
             });
             resultsMenu.show();
         } else {
-            console.log('+++++++++++++++I HAVE ENTERED IN ELSE');
             resultsMenu.hide();
             resultsMenu = new UI.Menu({
                 sections: [{
@@ -220,6 +221,9 @@ function getStatus() {
         var datetime = currentdate.getDate() + "/" + (currentdate.getMonth() + 1) + "/" + currentdate.getFullYear() + " @ " + currentdate.getHours() + ":" + currentdate.getMinutes();
         console.log(datetime);
         console.log('Failed fetching data: ' + error);
+			
+				var errorSubtitle = 'Server connection could not be made';
+				createErrorCardWithTitleAndSubtitle(errorTitle, errorSubtitle);
     });
 }
 
@@ -270,3 +274,13 @@ Pebble.addEventListener('webviewclosed', function (e) {
     splashWindow.show();
     getStatus();
 });
+
+function createErrorCardWithTitleAndSubtitle (title, subtitle) {
+	var card = new UI.Card({
+  title:title,
+  subtitle:subtitle
+});
+
+// Display the Card
+card.show();
+}
