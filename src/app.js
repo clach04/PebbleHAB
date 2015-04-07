@@ -152,6 +152,7 @@ function sendUpdate(url, command) {
         console.log('Failed posting data: ' + error);
 				var errorSubtitle = 'Command send failed';
 				createErrorCardWithTitleAndSubtitle(errorTitle, errorSubtitle);
+				splashWindow.hide();
     });
 }
 
@@ -224,6 +225,7 @@ function getStatus() {
 			
 				var errorSubtitle = 'Server connection could not be made';
 				createErrorCardWithTitleAndSubtitle(errorTitle, errorSubtitle);
+				splashWindow.hide();
     });
 }
 
