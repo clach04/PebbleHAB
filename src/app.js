@@ -116,7 +116,12 @@ var parseFeed = function (data, quantity) {
                 title: item.name,
                 subtitle: item.state
             });
-        }
+        } else if (item.type === 'ContactItem') {
+						items.push({
+                title: item.name,
+                subtitle: item.state
+            });
+				}
     }
 
     // Finally return whole array
