@@ -98,7 +98,7 @@ function getCredentials() {
 
 getCredentials();
 
-var parseFeed = function (data, quantity) {
+var parseSwitchItems = function (data, quantity) {
     items = [];
     var i;
     var array = JSON.parse(data);
@@ -111,17 +111,47 @@ var parseFeed = function (data, quantity) {
                 title: item.name,
                 subtitle: item.state
             });
-        } else if (item.name.indexOf("temp") > -1 || item.name.indexOf("Temp") > -1) {
+        }
+    }
+
+    // Finally return whole array
+    return items;
+};
+
+var parseTempItems = function (data, quantity) {
+    items = [];
+    var i;
+    var array = JSON.parse(data);
+    var len = array.item.length;
+    for (i = 0; i < len; i++) {
+        var item = array.item[i];
+        if (item.name.indexOf('temp') > -1 || item.name.indexOf('Temp') > -1) {
+            // Add to menu items array
             items.push({
                 title: item.name,
                 subtitle: item.state
             });
-        } else if (item.type === 'ContactItem') {
-						items.push({
+        }
+    }
+
+    // Finally return whole array
+    return items;
+};
+
+var parseContactItems = function (data, quantity) {
+    items = [];
+    var i;
+    var array = JSON.parse(data);
+    var len = array.item.length;
+    for (i = 0; i < len; i++) {
+        var item = array.item[i];
+        if (item.type === 'ContactItem') {
+            // Add to menu items array
+            items.push({
                 title: item.name,
                 subtitle: item.state
             });
-				}
+        }
     }
 
     // Finally return whole array
@@ -179,12 +209,20 @@ function getStatus() {
         console.log(datetime);
         console.log('Successfully fetched OpenHAB data!' + data);
         // Construct Menu to show to user
-        var menuItems = parseFeed(data);
+        var switchItems = parseSwitchItems(data);
+        var tempItems = parseTempItems(data);
+        var contactItems = parseContactItems(data);
         if ((typeof resultsMenu == "undefined")) {
             resultsMenu = new UI.Menu({
                 sections: [{
                     title: 'Items',
-                    items: menuItems
+                    items: switchItems
+                }, {
+                    title: 'Temperature Items',
+                    items: tempItems
+                }, {
+                    title: 'Contact Items',
+                    items: contactItems
                 }]
             });
             resultsMenu.on('select', function (e) {
@@ -199,11 +237,16 @@ function getStatus() {
             });
             resultsMenu.show();
         } else {
-            resultsMenu.hide();
             resultsMenu = new UI.Menu({
                 sections: [{
                     title: 'Items',
-                    items: menuItems
+                    items: switchItems
+                }, {
+                    title: 'Temperature Items',
+                    items: tempItems
+                }, {
+                    title: 'Contact Items',
+                    items: contactItems
                 }]
             });
             resultsMenu.on('select', function (e) {
@@ -214,6 +257,7 @@ function getStatus() {
                 } else if (e.item.subtitle == 'OFF') {
                     sendUpdate(postURL, 'ON');
                 }
+
             });
             resultsMenu.show();
         }
