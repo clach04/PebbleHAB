@@ -38,7 +38,7 @@
 <br>
 <p>PebbleHAB by Alex Bartis         <i>http://www.alexbartis.com</i></p>
 <p>PebbleKit JS Configuration Utility by Thomas Sarlandie         <i>http://www.sarfata.org</i></p>
-<p>Special thank to my awesome designer Alex Trofim               <i>http://alextrofim.ro</i></p>
+<p>Special thanks to my awesome designer Alex Trofim               <i>http://alextrofim.ro</i></p>
           </div>
         </div>
       </div>
@@ -48,7 +48,7 @@
         var options = {}
         //Add all textual values
         $('textarea, select, [type="hidden"], [type="password"], [type="text"]').each(function(){options[$(this).attr('id')] = $(this).val();})
-       
+        $('input type, select, [type="hidden"], [type="password"], [type="text"]').each(function(){options[$(this).attr('id')] = $(this).val();})
         return options;
       }
       $().ready(function() {
