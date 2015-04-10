@@ -237,7 +237,7 @@ function getStatus() {
                 setState(e.item.title, e.item.subtitle);
             });
         } else {
-						resultsMenu.hide();
+            resultsMenu.hide();
             createMenu(data);
             resultsMenu.on('select', function (e) {
                 console.log('The item is titled "' + e.item.title + '"');
@@ -271,14 +271,14 @@ function createMenu(data) {
             title: 'Items',
             items: switchItems
         }, {
-            title: 'Temperature',
-            items: tempItems
+            title: 'Dimmers',
+            items: dimmerItems
         }, {
             title: 'Contact Items',
             items: contactItems
         }, {
-            title: 'Dimmers',
-            items: dimmerItems
+            title: 'Temperature',
+            items: tempItems
         }]
     });
     resultsMenu.show();
@@ -291,64 +291,66 @@ function setState(itemTitle, currentState) {
     } else if (currentState == 'OFF') {
         sendUpdate(postURL, 'ON');
     } else if (!isNaN(currentState)) {
-			if (!(itemTitle.indexOf('temp') > -1 || itemTitle.indexOf('Temp') > -1)) {
-				console.log('item is valid number and not temp');
-				createDimmerWindow (itemTitle, currentState);
-			} else {
-				console.log('item is valid number and IS temp');
-			}
-		}
+        if (!(itemTitle.indexOf('temp') > -1 || itemTitle.indexOf('Temp') > -1)) {
+            console.log('item is valid number and not temp');
+            createDimmerWindow(itemTitle, currentState);
+        } else {
+            console.log('item is valid number and IS temp');
+        }
+    }
 }
 
-function createDimmerWindow (itemTitle, currentState) {
-				var dimmerWindow = new UI.Window({ fullscreen: true });
-				var title = new UI.Text({
-				position: new Vector2(0, 30),
-				size: new Vector2(144, 84),
-				font: 'gothic-28-bold',
-				text: itemTitle,
-			});
-				var state = new UI.Text({
-				position: new Vector2(0, 85),
-				size: new Vector2(144, 84),
-				font: 'gothic-24-bold',
-				text: currentState
-			});
-				dimmerWindow.add(title);
-				dimmerWindow.add(state);
-				dimmerWindow.show();
-	
-				dimmerWindow.on('click', 'up', function(event) {
-					console.log('up');
-					dimItem (itemTitle, currentState,'up');
-				});
-	
-				dimmerWindow.on('click', 'down', function(event) {
-					console.log('down');
-					dimItem (itemTitle, currentState,'down');
-				});
+function createDimmerWindow(itemTitle, currentState) {
+    var dimmerWindow = new UI.Window({
+        fullscreen: true
+    });
+    var title = new UI.Text({
+        position: new Vector2(0, 30),
+        size: new Vector2(144, 84),
+        font: 'gothic-28-bold',
+        text: itemTitle,
+    });
+    var state = new UI.Text({
+        position: new Vector2(0, 85),
+        size: new Vector2(144, 84),
+        font: 'gothic-24-bold',
+        text: currentState
+    });
+    dimmerWindow.add(title);
+    dimmerWindow.add(state);
+    dimmerWindow.show();
+
+    dimmerWindow.on('click', 'up', function (event) {
+        console.log('up');
+        dimItem(itemTitle, currentState, 'up');
+    });
+
+    dimmerWindow.on('click', 'down', function (event) {
+        console.log('down');
+        dimItem(itemTitle, currentState, 'down');
+    });
 }
 
-function dimItem (itemTitle, currentState, command) {
-			var postURL = URL + '/' + itemTitle;
-			if	(command == 'up') {
-					var increasedValue = parseInt(currentState) + 10;
-					console.log ('Parse INT ESTE ', increasedValue);
-					if (increasedValue <= 100) {
-						sendUpdate (postURL, increasedValue.toString());
-					} else {
-						sendUpdate (postURL, '100');
-					}
-			
-			} else if (command == 'down') {
-					var decreasedValue = parseInt(currentState) - 10;
-					console.log ('Parse INT ESTE ', decreasedValue);
-					if (decreasedValue >= 0) {
-						sendUpdate (postURL, decreasedValue.toString());
-					} else {
-						sendUpdate (postURL, '0');
-					}
-			}
+function dimItem(itemTitle, currentState, command) {
+    var postURL = URL + '/' + itemTitle;
+    if (command == 'up') {
+        var increasedValue = parseInt(currentState) + 10;
+        console.log('Parse INT ESTE ', increasedValue);
+        if (increasedValue <= 100) {
+            sendUpdate(postURL, increasedValue.toString());
+        } else {
+            sendUpdate(postURL, '100');
+        }
+
+    } else if (command == 'down') {
+        var decreasedValue = parseInt(currentState) - 10;
+        console.log('Parse INT ESTE ', decreasedValue);
+        if (decreasedValue >= 0) {
+            sendUpdate(postURL, decreasedValue.toString());
+        } else {
+            sendUpdate(postURL, '0');
+        }
+    }
 }
 
 function setCredentials(jsonString) {
