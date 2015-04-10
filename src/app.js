@@ -158,6 +158,26 @@ var parseContactItems = function (data, quantity) {
     return items;
 };
 
+var parseDimmerItems = function (data, quantity) {
+    items = [];
+    var i;
+    var array = JSON.parse(data);
+    var len = array.item.length;
+    for (i = 0; i < len; i++) {
+        var item = array.item[i];
+        if (item.type === 'DimmerItem') {
+            // Add to menu items array
+            items.push({
+                title: item.name,
+                subtitle: item.state
+            });
+        }
+    }
+
+    // Finally return whole array
+    return items;
+};
+
 function sendUpdate(url, command) {
     ajax({
         method: 'POST',
@@ -212,27 +232,26 @@ function getStatus() {
         var switchItems = parseSwitchItems(data);
         var tempItems = parseTempItems(data);
         var contactItems = parseContactItems(data);
+				var dimmerItems = parseDimmerItems(data);
         if ((typeof resultsMenu == "undefined")) {
             resultsMenu = new UI.Menu({
                 sections: [{
                     title: 'Items',
                     items: switchItems
                 }, {
-                    title: 'Temperature Items',
+                    title: 'Temperature',
                     items: tempItems
                 }, {
                     title: 'Contact Items',
                     items: contactItems
-                }]
+                }, {
+										title: 'Dimmers',
+                    items: dimmerItems
+								}]
             });
             resultsMenu.on('select', function (e) {
                 console.log('The item is titled "' + e.item.title + '"');
-                var postURL = URL + '/' + e.item.title;
-                if (e.item.subtitle == 'ON') {
-                    sendUpdate(postURL, 'OFF');
-                } else if (e.item.subtitle == 'OFF') {
-                    sendUpdate(postURL, 'ON');
-                }
+								setState (e.item.subtitle, e.item.title);
 
             });
             resultsMenu.show();
@@ -242,21 +261,19 @@ function getStatus() {
                     title: 'Items',
                     items: switchItems
                 }, {
-                    title: 'Temperature Items',
+                    title: 'Temperature',
                     items: tempItems
                 }, {
                     title: 'Contact Items',
                     items: contactItems
-                }]
+                }, {
+										title: 'Dimmers',
+                    items: dimmerItems
+								}]
             });
             resultsMenu.on('select', function (e) {
                 console.log('The item is titled "' + e.item.title + '"');
-                var postURL = URL + '/' + e.item.title;
-                if (e.item.subtitle == 'ON') {
-                    sendUpdate(postURL, 'OFF');
-                } else if (e.item.subtitle == 'OFF') {
-                    sendUpdate(postURL, 'ON');
-                }
+								setState (e.item.subtitle, e.item.title);
 
             });
             resultsMenu.show();
@@ -278,7 +295,16 @@ function getStatus() {
     });
 }
 
-function setCredentials(jsonString) {
+function setState (currentState, itemTitle) {
+		var postURL = URL + '/' +	itemTitle;
+		if (currentState == 'ON') {
+				sendUpdate(postURL, 'OFF');
+    } else if (currentState == 'OFF') {
+				sendUpdate(postURL, 'ON');
+    }
+}
+
+function setCredentials (jsonString) {
     var myObject = JSON.parse(jsonString);
 
     URL = myObject.server + '/rest/items';
