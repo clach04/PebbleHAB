@@ -229,54 +229,20 @@ function getStatus() {
         console.log(datetime);
         console.log('Successfully fetched OpenHAB data!' + data);
         // Construct Menu to show to user
-        var switchItems = parseSwitchItems(data);
-        var tempItems = parseTempItems(data);
-        var contactItems = parseContactItems(data);
-				var dimmerItems = parseDimmerItems(data);
+
         if ((typeof resultsMenu == "undefined")) {
-            resultsMenu = new UI.Menu({
-                sections: [{
-                    title: 'Items',
-                    items: switchItems
-                }, {
-                    title: 'Temperature',
-                    items: tempItems
-                }, {
-                    title: 'Contact Items',
-                    items: contactItems
-                }, {
-										title: 'Dimmers',
-                    items: dimmerItems
-								}]
-            });
+            createMenu(data);
             resultsMenu.on('select', function (e) {
                 console.log('The item is titled "' + e.item.title + '"');
-								setState (e.item.subtitle, e.item.title);
-
+                setState(e.item.subtitle, e.item.title);
             });
-            resultsMenu.show();
         } else {
-            resultsMenu = new UI.Menu({
-                sections: [{
-                    title: 'Items',
-                    items: switchItems
-                }, {
-                    title: 'Temperature',
-                    items: tempItems
-                }, {
-                    title: 'Contact Items',
-                    items: contactItems
-                }, {
-										title: 'Dimmers',
-                    items: dimmerItems
-								}]
-            });
+						resultsMenu.hide();
+            createMenu(data);
             resultsMenu.on('select', function (e) {
                 console.log('The item is titled "' + e.item.title + '"');
-								setState (e.item.subtitle, e.item.title);
-
+                setState(e.item.subtitle, e.item.title);
             });
-            resultsMenu.show();
         }
         // Show the Menu, hide the splash
         splashWindow.hide();
@@ -295,16 +261,54 @@ function getStatus() {
     });
 }
 
-function setState (currentState, itemTitle) {
-		var postURL = URL + '/' +	itemTitle;
-		if (currentState == 'ON') {
-				sendUpdate(postURL, 'OFF');
-    } else if (currentState == 'OFF') {
-				sendUpdate(postURL, 'ON');
-    }
+function createMenu(data) {
+    var switchItems = parseSwitchItems(data);
+    var tempItems = parseTempItems(data);
+    var contactItems = parseContactItems(data);
+    var dimmerItems = parseDimmerItems(data);
+    resultsMenu = new UI.Menu({
+        sections: [{
+            title: 'Items',
+            items: switchItems
+        }, {
+            title: 'Temperature',
+            items: tempItems
+        }, {
+            title: 'Contact Items',
+            items: contactItems
+        }, {
+            title: 'Dimmers',
+            items: dimmerItems
+        }]
+    });
+    resultsMenu.show();
 }
 
-function setCredentials (jsonString) {
+function setState(currentState, itemTitle) {
+    var postURL = URL + '/' + itemTitle;
+    if (currentState == 'ON') {
+        sendUpdate(postURL, 'OFF');
+    } else if (currentState == 'OFF') {
+        sendUpdate(postURL, 'ON');
+    } else if (!isNaN(currentState)) {
+			if (!(itemTitle.indexOf('temp') > -1 || itemTitle.indexOf('Temp') > -1)) {
+				console.log('item is valid number and not temp');
+				var wind = new UI.Window({ fullscreen: true });
+				var textfield = new UI.Text({
+				position: new Vector2(0, 0),
+				size: new Vector2(144, 168),
+				font: 'gothic-18-bold',
+				text: 'Gothic 18 Bold'
+			});
+				wind.add(textfield);
+				wind.show();
+			} else {
+				console.log('item is valid number and IS temp');
+			}
+		}
+}
+
+function setCredentials(jsonString) {
     var myObject = JSON.parse(jsonString);
 
     URL = myObject.server + '/rest/items';
@@ -314,11 +318,6 @@ function setCredentials (jsonString) {
     localStorage.setItem('server', myObject.server + '/rest/items');
     localStorage.setItem('user', myObject.username);
     localStorage.setItem('password', myObject.password);
-
-    console.log('Set credintials are ');
-    console.log(myObject.server + '/rest/items');
-    console.log(myObject.username);
-    console.log(myObject.password);
 
     getStatus();
 }
