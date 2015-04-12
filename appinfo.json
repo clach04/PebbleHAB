@@ -29,6 +29,16 @@
                 "type": "font"
             },
             {
+                "file": "images/action_icon_down.png",
+                "name": "IMAGES_ACTION_ICON_DOWN_PNG",
+                "type": "png"
+            },
+            {
+                "file": "images/action_icon_up.png",
+                "name": "IMAGES_ACTION_ICON_UP_PNG",
+                "type": "png"
+            },
+            {
                 "file": "images/IMAGE_MENU_ICON.png",
                 "menuIcon": true,
                 "name": "IMAGES_IMAGE_MENU_ICON_PNG",

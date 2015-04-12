@@ -238,6 +238,10 @@ function getStatus() {
         }
         // Show the Menu, hide the splash
         splashWindow.hide();
+			
+				if (typeof dimmerWindow != "undefined") {
+					dimmerWindow.hide();
+				}
     },
 
     function (error) {
@@ -257,7 +261,7 @@ function createMenu(data) {
     var dimmerItems = parseDimmerItems(data);
     resultsMenu = new UI.Menu({
         sections: [{
-            title: 'Items',
+            title: 'Switches',
             items: switchItems
         }, {
             title: 'Dimmers',
@@ -289,18 +293,24 @@ function setState(itemTitle, currentState) {
 
 function createDimmerWindow(itemTitle, currentState) {
     dimmerWindow = new UI.Window({
-        fullscreen: true
+        fullscreen: true,
+				action: {
+				up: 'images/action_icon_up.png',
+				down: 'images/action_icon_down.png',
+				backgroundColor: 'white'
+				}
     });
-    var title = new UI.Text({
+
+				var title = new UI.Text({
         position: new Vector2(0, 30),
         size: new Vector2(144, 84),
-        font: 'gothic-28-bold',
+        font: 'gothic-24-bold',
         text: itemTitle,
     });
-    var state = new UI.Text({
+				var state = new UI.Text({
         position: new Vector2(0, 85),
         size: new Vector2(144, 84),
-        font: 'gothic-24-bold',
+        font: 'gothic-18-bold',
         text: currentState
     });
     dimmerWindow.add(title);
@@ -314,9 +324,9 @@ function createDimmerWindow(itemTitle, currentState) {
     dimmerWindow.on('click', 'down', function (event) {
 				getDimmerStatus(itemTitle, 'down');
     });
+	
 		dimmerWindow.on('click', 'back', function (event) {
 				getStatus();
-				dimmerWindow.hide();
     });
 }
 
