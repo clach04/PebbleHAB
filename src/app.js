@@ -9,6 +9,9 @@ var items = [];
 var splashWindow = new UI.Window();
 var resultsMenu = new UI.Menu();
 var errorTitle = 'Error';
+var currentdate = new Date();
+var datetime = currentdate.getDate() + "/" + (currentdate.getMonth() + 1) + "/" + currentdate.getFullYear() + " @ " + currentdate.getHours() + ":" + currentdate.getMinutes();
+var dimmerWindow;
 
 var Base64 = {
     // private property
@@ -89,11 +92,6 @@ function getCredentials() {
         URL = 'http://demo.openhab.org:8080/rest/items';
         getStatus();
     }
-
-    console.log('Local credintials are ');
-    console.log(URL);
-    console.log(user);
-    console.log(password);
 }
 
 getCredentials();
@@ -191,20 +189,17 @@ function sendUpdate(url, command) {
     },
 
     function (data) {
-        var currentdate = new Date();
-        var datetime = currentdate.getDate() + "/" + (currentdate.getMonth() + 1) + "/" + currentdate.getFullYear() + " @ " + currentdate.getHours() + ":" + currentdate.getMinutes();
-        console.log(datetime);
-        console.log('Succesfully posted data');
-
-        getStatus();
+        console.log(datetime + ' ' + 'Succesfully posted data');
+        console.log(datetime + ' ' + 'value is int ' + parseInt(command, 10));
+        if (isNaN(command)) {
+						console.log ('isNan');
+           getStatus();
+				}
     },
 
     function (error) {
         // Failure!
-        var currentdate = new Date();
-        var datetime = currentdate.getDate() + "/" + (currentdate.getMonth() + 1) + "/" + currentdate.getFullYear() + " @ " + currentdate.getHours() + ":" + currentdate.getMinutes();
-        console.log(datetime);
-        console.log('Failed posting data: ' + error);
+        console.log(datetime + ' ' +'Failed posting data: ' + error);
         var errorSubtitle = 'Command send failed';
         createErrorCardWithTitleAndSubtitle(errorTitle, errorSubtitle);
         splashWindow.hide();
@@ -224,23 +219,20 @@ function getStatus() {
 
     function (data) {
         // Success!
-        var currentdate = new Date();
-        var datetime = currentdate.getDate() + "/" + (currentdate.getMonth() + 1) + "/" + currentdate.getFullYear() + " @ " + currentdate.getHours() + ":" + currentdate.getMinutes();
-        console.log(datetime);
-        console.log('Successfully fetched OpenHAB data!' + data);
+        console.log(datetime + ' ' + 'Successfully fetched OpenHAB data!' + data);
         // Construct Menu to show to user
 
         if ((typeof resultsMenu == "undefined")) {
             createMenu(data);
             resultsMenu.on('select', function (e) {
-                console.log('The item is titled "' + e.item.title + '"');
+            console.log(datetime + ' ' + 'The item is titled "' + e.item.title + '"');
                 setState(e.item.title, e.item.subtitle);
             });
         } else {
             resultsMenu.hide();
             createMenu(data);
             resultsMenu.on('select', function (e) {
-                console.log('The item is titled "' + e.item.title + '"');
+            console.log(datetime + ' ' + 'The item is titled "' + e.item.title + '"');
                 setState(e.item.title, e.item.subtitle);
             });
         }
@@ -250,10 +242,7 @@ function getStatus() {
 
     function (error) {
         // Failure!
-        var currentdate = new Date();
-        var datetime = currentdate.getDate() + "/" + (currentdate.getMonth() + 1) + "/" + currentdate.getFullYear() + " @ " + currentdate.getHours() + ":" + currentdate.getMinutes();
-        console.log(datetime);
-        console.log('Failed fetching data: ' + error);
+        console.log(datetime + ' ' + 'Failed fetching data: ' + error);
 
         var errorSubtitle = 'Server connection could not be made';
         createErrorCardWithTitleAndSubtitle(errorTitle, errorSubtitle);
@@ -292,16 +281,14 @@ function setState(itemTitle, currentState) {
         sendUpdate(postURL, 'ON');
     } else if (!isNaN(currentState)) {
         if (!(itemTitle.indexOf('temp') > -1 || itemTitle.indexOf('Temp') > -1)) {
-            console.log('item is valid number and not temp');
+            console.log(datetime + ' ' + 'Item is valid number and not temp');
             createDimmerWindow(itemTitle, currentState);
-        } else {
-            console.log('item is valid number and IS temp');
         }
     }
 }
 
 function createDimmerWindow(itemTitle, currentState) {
-    var dimmerWindow = new UI.Window({
+    dimmerWindow = new UI.Window({
         fullscreen: true
     });
     var title = new UI.Text({
@@ -321,13 +308,39 @@ function createDimmerWindow(itemTitle, currentState) {
     dimmerWindow.show();
 
     dimmerWindow.on('click', 'up', function (event) {
-        console.log('up');
-        dimItem(itemTitle, currentState, 'up');
+        getDimmerStatus(itemTitle, 'up');
     });
 
     dimmerWindow.on('click', 'down', function (event) {
-        console.log('down');
-        dimItem(itemTitle, currentState, 'down');
+				getDimmerStatus(itemTitle, 'down');
+    });
+		dimmerWindow.on('click', 'back', function (event) {
+				getStatus();
+				dimmerWindow.hide();
+    });
+}
+
+function getDimmerStatus(itemTitle, command) {
+    ajax({
+        type: "GET",
+        url: URL + '/' + itemTitle,
+        headers: {
+            Accept: "application/json; charset=utf-8",
+                "Content-Type": "application/json; charset=utf-8",
+            Authorization: "Basic " + Base64.encode(user + ':' + password)
+        }
+    },
+
+    function (data) {
+		console.log(data);
+		var array = JSON.parse(data);
+			dimItem(itemTitle, array.state, command);
+    },
+
+    function (error) {
+			console.log(datetime + ' ' + 'Failed fetching data: ' + error);
+			var errorSubtitle = 'Server connection could not be made';
+      createErrorCardWithTitleAndSubtitle(errorTitle, errorSubtitle);
     });
 }
 
@@ -335,7 +348,6 @@ function dimItem(itemTitle, currentState, command) {
     var postURL = URL + '/' + itemTitle;
     if (command == 'up') {
         var increasedValue = parseInt(currentState) + 10;
-        console.log('Parse INT ESTE ', increasedValue);
         if (increasedValue <= 100) {
             sendUpdate(postURL, increasedValue.toString());
         } else {
@@ -344,9 +356,8 @@ function dimItem(itemTitle, currentState, command) {
 
     } else if (command == 'down') {
         var decreasedValue = parseInt(currentState) - 10;
-        console.log('Parse INT ESTE ', decreasedValue);
         if (decreasedValue >= 0) {
-            sendUpdate(postURL, decreasedValue.toString());
+						sendUpdate(postURL, decreasedValue.toString());
         } else {
             sendUpdate(postURL, '0');
         }
@@ -389,7 +400,7 @@ Pebble.addEventListener('showConfiguration', function (e) {
 });
 
 Pebble.addEventListener('webviewclosed', function (e) {
-    console.log('Configuration window returned: ' + e.response);
+		console.log(datetime + ' ' + 'Configuration window returned: ' + e.response);
     setCredentials(e.response);
     splashWindow.add(text);
     splashWindow.show();
