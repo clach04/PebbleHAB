@@ -12,6 +12,8 @@ var errorTitle = 'Error';
 var currentdate = new Date();
 var datetime = currentdate.getDate() + "/" + (currentdate.getMonth() + 1) + "/" + currentdate.getFullYear() + " @ " + currentdate.getHours() + ":" + currentdate.getMinutes();
 var dimmerWindow;
+var titleText;
+var stateText;
 
 var Base64 = {
     // private property
@@ -300,21 +302,21 @@ function createDimmerWindow(itemTitle, currentState) {
 				backgroundColor: 'white'
 				}
     });
-
-				var title = new UI.Text({
-        position: new Vector2(0, 30),
-        size: new Vector2(144, 84),
-        font: 'gothic-24-bold',
+				titleText = new UI.Text({
+        position: new Vector2(0, 15),
+        size: new Vector2(114, 84),
+        font: 'gothic-28-bold',
+				textOverflow: 'wrap',
         text: itemTitle,
     });
-				var state = new UI.Text({
-        position: new Vector2(0, 85),
-        size: new Vector2(144, 84),
-        font: 'gothic-18-bold',
+				stateText = new UI.Text({
+        position: new Vector2(0, 105),
+        size: new Vector2(114, 84),
+        font: 'gothic-24-bold',
         text: currentState
     });
-    dimmerWindow.add(title);
-    dimmerWindow.add(state);
+    dimmerWindow.add(titleText);
+    dimmerWindow.add(stateText);
     dimmerWindow.show();
 
     dimmerWindow.on('click', 'up', function (event) {
@@ -356,22 +358,29 @@ function getDimmerStatus(itemTitle, command) {
 
 function dimItem(itemTitle, currentState, command) {
     var postURL = URL + '/' + itemTitle;
+		var newState;
     if (command == 'up') {
         var increasedValue = parseInt(currentState) + 10;
         if (increasedValue <= 100) {
             sendUpdate(postURL, increasedValue.toString());
+						newState = increasedValue.toString();
         } else {
             sendUpdate(postURL, '100');
+						newState = '100';
         }
 
     } else if (command == 'down') {
         var decreasedValue = parseInt(currentState) - 10;
         if (decreasedValue >= 0) {
 						sendUpdate(postURL, decreasedValue.toString());
+						newState = decreasedValue.toString();
         } else {
             sendUpdate(postURL, '0');
+						newState = '0';
         }
     }
+		stateText.text (newState);
+		dimmerWindow.add(stateText);
 }
 
 function setCredentials(jsonString) {
