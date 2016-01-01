@@ -3,25 +3,25 @@
     "capabilities": [
         "configurable"
     ],
-    "companyName": "alex.bartis@gmail.com",
-    "longName": "PebbleHAB",
+    "companyName": "clach04",
+    "longName": "PebbleHAB_dbg",
     "projectType": "pebblejs",
     "resources": {
         "media": [
             {
                 "file": "images/menu_icon.png",
                 "name": "IMAGE_MENU_ICON",
-                "type": "png"
+                "type": "bitmap"
             },
             {
                 "file": "images/logo_splash.png",
                 "name": "IMAGE_LOGO_SPLASH",
-                "type": "png"
+                "type": "bitmap"
             },
             {
                 "file": "images/tile_splash.png",
                 "name": "IMAGE_TILE_SPLASH",
-                "type": "png"
+                "type": "bitmap"
             },
             {
                 "file": "fonts/UbuntuMono-Regular.ttf",
@@ -31,26 +31,32 @@
             {
                 "file": "images/action_icon_down.png",
                 "name": "IMAGES_ACTION_ICON_DOWN_PNG",
-                "type": "png"
+                "type": "bitmap"
             },
             {
                 "file": "images/action_icon_up.png",
                 "name": "IMAGES_ACTION_ICON_UP_PNG",
-                "type": "png"
+                "type": "bitmap"
             },
             {
                 "file": "images/IMAGE_MENU_ICON.png",
                 "menuIcon": true,
                 "name": "IMAGES_IMAGE_MENU_ICON_PNG",
-                "type": "png"
+                "type": "bitmap"
             }
         ]
     },
-    "shortName": "PebbleHAB",
-    "uuid": "5f6aa1ed-7e18-4263-a3a6-a80fd1b052e4",
+    "sdkVersion": "3",
+    "shortName": "PebbleHAB_dbg",
+    "targetPlatforms": [
+        "aplite",
+        "basalt"
+    ],
+    "uuid": "6c8f5bc5-f326-44e5-bd75-d865a40859cb",
     "versionCode": 1,
     "versionLabel": "1.1",
     "watchapp": {
+        "hiddenApp": false,
         "watchface": false
     }
 }
