@@ -192,6 +192,7 @@ function sendUpdate(url, command) {
 
     function (data) {
         console.log(datetime + ' ' + 'Succesfully posted data');
+        console.log(datetime + ' ' + 'command: ' + command);
         console.log(datetime + ' ' + 'value is int ' + parseInt(command, 10));
         if (isNaN(command)) {
 						console.log ('isNan');
@@ -209,6 +210,8 @@ function sendUpdate(url, command) {
 }
 
 function getStatus() {
+    console.log(datetime + ' ' + 'getStatus()');
+    console.log(datetime + ' ' + 'getStatus() URL: ' + URL);
     ajax({
         type: "GET",
         url: URL,
