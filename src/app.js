@@ -105,6 +105,13 @@ var parseSwitchItems = function (data, quantity) {
     var len = array.item.length;
     for (i = 0; i < len; i++) {
         var item = array.item[i];
+
+        if (item.type === 'SwitchItem' && item.state === 'Uninitialized')
+        {
+            /* The check below results in missing menu entries */
+            item.state = 'OFF'
+        }
+
         if (item.type === 'SwitchItem' && item.state != 'Uninitialized') {
             // Add to menu items array
             items.push({
