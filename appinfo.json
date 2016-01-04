@@ -29,13 +29,13 @@
                 "type": "font"
             },
             {
-                "file": "images/action_icon_down.png",
-                "name": "IMAGES_ACTION_ICON_DOWN_PNG",
+                "file": "images/action_icon_up.png",
+                "name": "IMAGES_ACTION_ICON_UP_PNG",
                 "type": "bitmap"
             },
             {
-                "file": "images/action_icon_up.png",
-                "name": "IMAGES_ACTION_ICON_UP_PNG",
+                "file": "images/action_icon_down.png",
+                "name": "IMAGES_ACTION_ICON_DOWN_PNG",
                 "type": "bitmap"
             },
             {
