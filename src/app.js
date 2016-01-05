@@ -297,8 +297,8 @@ function createDimmerWindow(itemTitle, currentState) {
     dimmerWindow = new UI.Window({
         fullscreen: true,
 				action: {
-				up: 'images/action_icon_up.png',
-				down: 'images/action_icon_down.png',
+				up: 'IMAGES_ACTION_ICON_UP_PNG',
+				down: 'IMAGES_ACTION_ICON_DOWN_PNG',
 				backgroundColor: 'white'
 				}
     });
