@@ -105,7 +105,8 @@ var parseSwitchItems = function (data, quantity) {
     var len = array.item.length;
     for (i = 0; i < len; i++) {
         var item = array.item[i];
-        if (item.type === 'SwitchItem' && item.state != 'Uninitialized') {
+
+        if (item.type === 'SwitchItem') {
             // Add to menu items array
             items.push({
                 title: item.name,
@@ -285,6 +286,8 @@ function setState(itemTitle, currentState) {
     if (currentState == 'ON') {
         sendUpdate(postURL, 'OFF');
     } else if (currentState == 'OFF') {
+        sendUpdate(postURL, 'ON');
+    } else if (currentState == 'Uninitialized') {
         sendUpdate(postURL, 'ON');
     } else if (!isNaN(currentState)) {
         if (!(itemTitle.indexOf('temp') > -1 || itemTitle.indexOf('Temp') > -1)) {
