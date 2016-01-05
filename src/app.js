@@ -10,10 +10,14 @@ var splashWindow = new UI.Window();
 var resultsMenu = new UI.Menu();
 var errorTitle = 'Error';
 var currentdate = new Date();
-var datetime = currentdate.getDate() + "/" + (currentdate.getMonth() + 1) + "/" + currentdate.getFullYear() + " @ " + currentdate.getHours() + ":" + currentdate.getMinutes();
 var dimmerWindow;
 var titleText;
 var stateText;
+
+function debug_log(msg) {
+    // TODO use ISO datetime format instead of locale...
+    console.log(Date().toLocaleString() + ": " + msg);
+};
 
 var Base64 = {
     // private property
@@ -192,17 +196,17 @@ function sendUpdate(url, command) {
     },
 
     function (data) {
-        console.log(datetime + ' ' + 'Succesfully posted data');
-        console.log(datetime + ' ' + 'command: ' + command);
+        debug_log('Succesfully posted data');
+        debug_log('command: ' + command);
         if (isNaN(command)) {
-						console.log ('isNan');
+						debug_log('isNan');
            getStatus();
 				}
     },
 
     function (error) {
         // Failure!
-        console.log(datetime + ' ' +'Failed posting data: ' + error);
+        debug_log('Failed posting data: ' + error);
         var errorSubtitle = 'Command send failed';
         createErrorCardWithTitleAndSubtitle(errorTitle, errorSubtitle);
         splashWindow.hide();
@@ -210,7 +214,7 @@ function sendUpdate(url, command) {
 }
 
 function getStatus() {
-    console.log(datetime + ' ' + 'getStatus() URL: ' + URL);
+    debug_log('getStatus() URL: ' + URL);
     ajax({
         type: "GET",
         url: URL,
@@ -223,20 +227,20 @@ function getStatus() {
 
     function (data) {
         // Success!
-        console.log(datetime + ' ' + 'Successfully fetched OpenHAB data!' + data);
+        debug_log('Successfully fetched OpenHAB data!' + data);
         // Construct Menu to show to user
 
         if ((typeof resultsMenu == "undefined")) {
             createMenu(data);
             resultsMenu.on('select', function (e) {
-            console.log(datetime + ' ' + 'The item is titled "' + e.item.title + '"');
+            debug_log('The item is titled "' + e.item.title + '"');
                 setState(e.item.title, e.item.subtitle);
             });
         } else {
             resultsMenu.hide();
             createMenu(data);
             resultsMenu.on('select', function (e) {
-            console.log(datetime + ' ' + 'The item is titled "' + e.item.title + '"');
+            debug_log('The item is titled "' + e.item.title + '"');
                 setState(e.item.title, e.item.subtitle);
             });
         }
@@ -250,7 +254,7 @@ function getStatus() {
 
     function (error) {
         // Failure!
-        console.log(datetime + ' ' + 'Failed fetching data: ' + error);
+        debug_log('Failed fetching data: ' + error);
 
         var errorSubtitle = 'Server connection could not be made';
         createErrorCardWithTitleAndSubtitle(errorTitle, errorSubtitle);
@@ -291,7 +295,7 @@ function setState(itemTitle, currentState) {
         sendUpdate(postURL, 'ON');
     } else if (!isNaN(currentState)) {
         if (!(itemTitle.indexOf('temp') > -1 || itemTitle.indexOf('Temp') > -1)) {
-            console.log(datetime + ' ' + 'Item is valid number and not temp');
+            debug_log('Item is valid number and not temp');
             createDimmerWindow(itemTitle, currentState);
         }
     }
@@ -348,13 +352,13 @@ function getDimmerStatus(itemTitle, command) {
     },
 
     function (data) {
-		console.log(data);
+		debug_log(data);
 		var array = JSON.parse(data);
 			dimItem(itemTitle, array.state, command);
     },
 
     function (error) {
-			console.log(datetime + ' ' + 'Failed fetching data: ' + error);
+			debug_log('Failed fetching data: ' + error);
 			var errorSubtitle = 'Server connection could not be made';
       createErrorCardWithTitleAndSubtitle(errorTitle, errorSubtitle);
     });
@@ -423,7 +427,7 @@ Pebble.addEventListener('showConfiguration', function (e) {
 });
 
 Pebble.addEventListener('webviewclosed', function (e) {
-		console.log(datetime + ' ' + 'Configuration window returned: ' + e.response);
+		debug_log('Configuration window returned: ' + e.response);
     setCredentials(e.response);
     splashWindow.add(text);
     splashWindow.show();
