@@ -91,7 +91,7 @@ function getCredentials() {
         URL = localStorage.getItem('server');
         getStatus();
     } else {
-        URL = 'http://demo.openhab.org:8080/rest/items';
+        URL = 'http://demo.openhab.org:9080/rest/items';
         getStatus();
     }
 }
@@ -102,9 +102,18 @@ var parseSwitchItems = function (data, quantity) {
     items = [];
     var i;
     var array = JSON.parse(data);
-    var len = array.item.length;
-    for (i = 0; i < len; i++) {
-        var item = array.item[i];
+    if (typeof item_array === "undefined")
+    {
+        // Probably OpenHAB2 (or could be junk...)
+        item_array = array;
+    }
+    else
+    {
+        // OpenHAB 1
+        //item_array = array.item;
+    }
+    for (i in item_array) {
+        var item = item_array[i];
 
         if (item.type === 'SwitchItem') {
             // Add to menu items array
@@ -123,9 +132,19 @@ var parseTempItems = function (data, quantity) {
     items = [];
     var i;
     var array = JSON.parse(data);
-    var len = array.item.length;
-    for (i = 0; i < len; i++) {
-        var item = array.item[i];
+    var item_array = array.item;
+    if (typeof item_array === "undefined")
+    {
+        // Probably OpenHAB2 (or could be junk...)
+        item_array = array;
+    }
+    else
+    {
+        // OpenHAB 1
+        //item_array = array.item;
+    }
+    for (i in item_array) {
+        var item = item_array[i];
         if (item.name.indexOf('temp') > -1 || item.name.indexOf('Temp') > -1) {
             // Add to menu items array
             items.push({
@@ -143,9 +162,19 @@ var parseContactItems = function (data, quantity) {
     items = [];
     var i;
     var array = JSON.parse(data);
-    var len = array.item.length;
-    for (i = 0; i < len; i++) {
-        var item = array.item[i];
+    var item_array = array.item;
+    if (typeof item_array === "undefined")
+    {
+        // Probably OpenHAB2 (or could be junk...)
+        item_array = array;
+    }
+    else
+    {
+        // OpenHAB 1
+        //item_array = array.item;
+    }
+    for (i in item_array) {
+        var item = item_array[i];
         if (item.type === 'ContactItem') {
             // Add to menu items array
             items.push({
@@ -163,9 +192,19 @@ var parseDimmerItems = function (data, quantity) {
     items = [];
     var i;
     var array = JSON.parse(data);
-    var len = array.item.length;
-    for (i = 0; i < len; i++) {
-        var item = array.item[i];
+    var item_array = array.item;
+    if (typeof item_array === "undefined")
+    {
+        // Probably OpenHAB2 (or could be junk...)
+        item_array = array;
+    }
+    else
+    {
+        // OpenHAB 1
+        //item_array = array.item;
+    }
+    for (i in item_array) {
+        var item = item_array[i];
         if (item.type === 'DimmerItem') {
             // Add to menu items array
             items.push({
