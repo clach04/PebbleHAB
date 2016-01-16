@@ -102,6 +102,7 @@ var parseSwitchItems = function (data, quantity) {
     items = [];
     var i;
     var array = JSON.parse(data);
+    var item_array = array.item;
     if (typeof item_array === "undefined")
     {
         // Probably OpenHAB2 (or could be junk...)
